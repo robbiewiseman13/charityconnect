@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     "simple_history",
     # local app
     "core",
+    "accounts.apps.AccountsConfig",
+    "charities.apps.CharitiesConfig",
+    "events.apps.EventsConfig",
 ]
 
 # Middleware

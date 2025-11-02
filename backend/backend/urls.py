@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 from core.views import health, create_payment_intent_view, stripe_webhook, ai_suggest_event
+from events.views import PublicEventListView
 
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -35,4 +36,5 @@ urlpatterns = [
     path('api/payments/create-intent/', create_payment_intent_view),
     path('api/webhooks/stripe/', stripe_webhook),
     path('api/ai/suggest/', ai_suggest_event),
+    path('api/events/public/', PublicEventListView.as_view(), name='public-events'),
 ]
