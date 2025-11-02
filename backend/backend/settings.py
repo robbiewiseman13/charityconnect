@@ -12,7 +12,7 @@ from dotenv import load_dotenv, find_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Load environment variables from .env file
-load_dotenv(find_dotenv(filename=".env", usecwd=True))
+load_dotenv(BASE_DIR / '.env')
 
 # Security & Debug
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret-change-me")
@@ -76,19 +76,34 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 # Database
-# Uses PostgreSQL if env vars exist, otherwise defaults to SQLite
-USE_POSTGRES = bool(os.getenv("DB_NAME"))
+# Define env variables first
+DB_NAME = os.getenv("DB_NAME", "").strip()
+DB_USER = os.getenv("DB_USER", "").strip()
+DB_PASSWORD = os.getenv("DB_PASSWORD", "").strip()
+DB_HOST = os.getenv("DB_HOST", "localhost").strip()
+DB_PORT = os.getenv("DB_PORT", "5432").strip()
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql" if USE_POSTGRES else "django.db.backends.sqlite3",
-        "NAME": os.getenv("DB_NAME") or (BASE_DIR / "db.sqlite3"),
-        "USER": os.getenv("DB_USER", ""),
-        "PASSWORD": os.getenv("DB_PASSWORD", ""),
-        "HOST": os.getenv("DB_HOST", ""),
-        "PORT": os.getenv("DB_PORT", ""),
+USE_POSTGRES = os.getenv("USE_POSTGRES", "").strip().lower() in ("1", "true", "yes", "on")
+POSTGRES_READY = USE_POSTGRES and all([DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT])
+
+if DB_NAME:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": DB_NAME,
+            "USER": DB_USER,
+            "PASSWORD": DB_PASSWORD,
+            "HOST": DB_HOST,
+            "PORT": DB_PORT,
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 # Email Settings
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND") or (
